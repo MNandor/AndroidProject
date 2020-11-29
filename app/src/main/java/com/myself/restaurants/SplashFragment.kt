@@ -7,8 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 import com.myself.restaurants.room.AppDatabase
 import com.myself.restaurants.room.Repository
+import com.myself.restaurants.room.User
 
 
 class SplashFragment : Fragment() {
@@ -32,10 +34,20 @@ class SplashFragment : Fragment() {
 
         Thread(Runnable {
             var db = Repository().getDAO()
-            var test = db.getAll().size.toString()
+            var test = db.getAll()
             activity?.runOnUiThread(Runnable {
-                Toast.makeText(context, test, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, test.size.toString(), Toast.LENGTH_SHORT).show()
             })
+
+            if (test.size < 1){
+                var defaultUser = User(id = 1, pic = "", address = "", phone = "", email = "", name = "John", addressCityOnly = "Baltimore", loggedin = true)
+                db.insertUser(defaultUser)
+                test = listOf(defaultUser)
+            }
+
+            ProfileFragment.user = test[0]
+
+            findNavController().navigate(R.id.action_splashFragment_to_detailsFragment)
 
         }).start()
 
