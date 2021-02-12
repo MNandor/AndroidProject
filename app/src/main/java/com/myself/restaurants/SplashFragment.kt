@@ -11,6 +11,8 @@ import androidx.navigation.fragment.findNavController
 import com.myself.restaurants.room.AppDatabase
 import com.myself.restaurants.room.Repository
 import com.myself.restaurants.room.User
+import retrofit2.Retrofit
+import java.lang.Thread.sleep
 
 
 class SplashFragment : Fragment() {
@@ -35,9 +37,6 @@ class SplashFragment : Fragment() {
         Thread(Runnable {
             var db = Repository().getDAO()
             var test = db.getAll()
-            activity?.runOnUiThread(Runnable {
-                Toast.makeText(context, test.size.toString(), Toast.LENGTH_SHORT).show()
-            })
 
             if (test.size < 1){
                 var defaultUser = User(id = 1, pic = "", address = "", phone = "", email = "", name = "John", addressCityOnly = "Baltimore", loggedin = true)
@@ -47,7 +46,15 @@ class SplashFragment : Fragment() {
 
             ProfileFragment.user = test[0]
 
-            findNavController().navigate(R.id.action_splashFragment_to_detailsFragment)
+            sleep(2000)
+
+
+            var repo = com.myself.restaurants.retrofit.Retrofit()
+            var resp = repo.getCities().execute()
+
+            MainFragment.cities = resp?.body()?.cities
+
+            findNavController().navigate(R.id.action_splashFragment_to_mainFragment)
 
         }).start()
 
